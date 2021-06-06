@@ -1,0 +1,23 @@
+# parabase
+
+```go
+package foo_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/nasjp/parabase"
+	"github.com/nasjp/parabase/mysql"
+)
+
+func TestFoo(t *testing.T) {
+	db := parabase.Use(&parabase.Config{
+		ParaNum:            5,
+		DriverName:         "mysql",
+		DataSourceName:     "root:password@tcp(db:3306)/",
+		Timeout:            time.Second * 3,
+		ManagementDatabase: mysql.DefaultManagentDB,
+	})
+}
+```
