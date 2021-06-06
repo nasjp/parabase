@@ -52,11 +52,11 @@ func Cleanup(db *sql.DB, prefix string) error {
 func GetCfg() (*parabase.Config, string) {
 	managementDatabase, prefix := randomManagementDatabase()
 	return &parabase.Config{
-		ParaNum:            5,
-		DriverName:         "mysql",
-		DataSourceName:     "root:password@tcp(db:3306)/",
-		Timeout:            time.Second * 3,
-		ManagementDatabase: managementDatabase,
+		DegreeOfParallelism: 5,
+		DriverName:          "mysql",
+		DataSourceName:      "root:password@tcp(db:3306)/",
+		Timeout:             time.Second * 3,
+		ManagementDatabase:  managementDatabase,
 	}, prefix
 }
 

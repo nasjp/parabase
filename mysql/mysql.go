@@ -85,11 +85,11 @@ func (d *ManagementDatabase) Setup(db *sql.DB, cfg *parabase.Config) error {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, d.setupManagementTable(cfg.ParaNum)); err != nil {
+	if _, err := db.ExecContext(ctx, d.setupManagementTable(cfg.DegreeOfParallelism)); err != nil {
 		return err
 	}
 
-	for id := 1; id <= cfg.ParaNum; id++ {
+	for id := 1; id <= cfg.DegreeOfParallelism; id++ {
 		if _, err := db.ExecContext(ctx, d.defineTestDB(id)); err != nil {
 			return err
 		}
@@ -121,13 +121,17 @@ func (d *ManagementDatabase) Get(db *sql.DB, cfg *parabase.Config) (*sql.DB, fun
 		case <-ctx.Done():
 			return nil, nil, errors.New("allocated deadline exceeded")
 		default:
-			if _, err := db.ExecContext(ctx, d.allocateTestDB(token)); err != nil {
+			result, err := db.ExecContext(ctx, d.allocateTestDB(token))
+			if err != nil {
+				return nil, nil, err
+			}
+
+			if _, err := result.RowsAffected(); err != nil {
 				return nil, nil, err
 			}
 
 			var id int
-
-			err := db.QueryRowContext(ctx, d.checkAllocatedTestDB(token)).Scan(&id)
+			err = db.QueryRowContext(ctx, d.checkAllocatedTestDB(token)).Scan(&id)
 			if errors.Is(err, sql.ErrNoRows) {
 				time.Sleep(time.Millisecond)
 				continue

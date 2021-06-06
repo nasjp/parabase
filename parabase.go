@@ -7,11 +7,11 @@ import (
 )
 
 type Config struct {
-	ParaNum            int
-	Timeout            time.Duration
-	DriverName         string
-	DataSourceName     string
-	ManagementDatabase ManagementDatabase
+	DegreeOfParallelism int
+	Timeout             time.Duration
+	DriverName          string
+	DataSourceName      string
+	ManagementDatabase  ManagementDatabase
 }
 
 type ManagementDatabase interface {
