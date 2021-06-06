@@ -11,10 +11,10 @@ type Config struct {
 	Timeout            time.Duration
 	DriverName         string
 	DataSourceName     string
-	ManagementDatabase managementDatabase
+	ManagementDatabase ManagementDatabase
 }
 
-type managementDatabase interface {
+type ManagementDatabase interface {
 	Connect(dbName string, cfg *Config) (*sql.DB, error)
 	Setup(*sql.DB, *Config) error
 	Get(db *sql.DB, cfg *Config) (*sql.DB, func(testing.TB), error)
