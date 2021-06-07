@@ -12,9 +12,7 @@ services:
       - mysql
 
   mysql:
-    build:
-      context: .
-      dockerfile: Dockerfile-mysql
+    image: mysql:5.7.34
     ports:
       - "3306:3306"
     environment:
