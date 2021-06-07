@@ -12,5 +12,5 @@ test: ## go test
 ifeq ($(IS_DOCKER), true)
 	go test ./... -race -v
 else
-	docker compose run --rm app bash -c "go test ./... -race -v"
+	docker-compose run --rm app bash -c "go test ./... -race -v"
 endif
