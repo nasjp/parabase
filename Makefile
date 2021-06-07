@@ -4,13 +4,13 @@ help:
 
 .PHONY: cleanup
 cleanup: ## cleanup test db
-	docker compose exec db bash -c "mysql -u root --password=password -e 'show databases' | grep _test | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
-	docker compose exec db bash -c "mysql -u root --password=password -e 'show databases' | grep _management | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
+	docker compose exec mysql bash -c "mysql -u root --password=password -e 'show databases' | grep _test | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
+	docker compose exec mysql bash -c "mysql -u root --password=password -e 'show databases' | grep _management | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
 
 .PHONY: test
 test: ## go test
 ifeq ($(IS_DOCKER), true)
-	go test ./... -race -v
+	go test ./... -race
 else
-	docker-compose run --rm app bash -c "go test ./... -race -v"
+	docker-compose run --rm app bash -c "sh wait.sh go test ./... -race"
 endif

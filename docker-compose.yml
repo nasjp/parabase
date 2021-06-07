@@ -2,15 +2,19 @@ version: '3.4'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-app
     volumes:
         - ./:/app:delegated
     working_dir: /app
     depends_on:
-      - db
+      - mysql
 
-  db:
-    image: mysql:5.7.25
+  mysql:
+    build:
+      context: .
+      dockerfile: Dockerfile-mysql
     ports:
       - "3306:3306"
     environment:

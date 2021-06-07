@@ -21,7 +21,18 @@ jobs:
           load: true
           tags: nasjp/parabase:latest
           builder: ${{ steps.buildx.outputs.name }}
-          file: ./Dockerfile
+          file: ./Dockerfile-app
+          context: .
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          tags: mysql/5.7.34
+          builder: ${{ steps.buildx.outputs.name }}
+          file: ./Dockerfile-mysql
           context: .
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache

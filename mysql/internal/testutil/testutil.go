@@ -54,7 +54,7 @@ func GetCfg() (*parabase.Config, string) {
 	return &parabase.Config{
 		DegreeOfParallelism: 5,
 		DriverName:          "mysql",
-		DataSourceName:      "root:password@tcp(db:3306)/",
+		DataSourceName:      "root:password@tcp(mysql:3306)/",
 		Timeout:             time.Second * 10,
 		ManagementDatabase:  managementDatabase,
 	}, prefix

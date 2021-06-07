@@ -1,0 +1,13 @@
+FROM golang:1.16.5
+
+RUN apt-get update -qq
+RUN apt-get install -y default-mysql-client
+
+WORKDIR /app
+
+COPY go.mod /app/go.mod
+COPY go.sum /app/go.sum
+
+ENV IS_DOCKER true
+
+RUN go mod download
