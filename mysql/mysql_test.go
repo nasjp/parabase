@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/nasjp/parabase"
@@ -27,77 +29,231 @@ func TestSetupAndTeardown(t *testing.T) {
 func TestUse(t *testing.T) {
 	t.Parallel()
 
-	t.Run("One", func(t *testing.T) {
-		t.Parallel()
+	tests := []struct {
+		name    string
+		process func(t *testing.T) string
+	}{
+		{
+			"One",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown := testUse(t, cfg, prefix)
 
-		cfg, prefix := testutil.GetCfg()
-		testUse(t, cfg, prefix)
+				testTeardown(t)
 
-		t.Cleanup(func() {
-			if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
-				t.Fatal(err)
-			}
+				return prefix
+			},
+		},
+		{
+			"Two",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+
+				testTeardown2(t)
+				testTeardown1(t)
+
+				return prefix
+			},
+		},
+		{
+			"Three",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				return prefix
+			},
+		},
+		{
+			"Four",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+				testTeardown4 := testUse(t, cfg, prefix)
+
+				testTeardown4(t)
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				return prefix
+			},
+		},
+		{
+			"Five",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+				testTeardown4 := testUse(t, cfg, prefix)
+				testTeardown5 := testUse(t, cfg, prefix)
+
+				testTeardown5(t)
+				testTeardown4(t)
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				return prefix
+			},
+		},
+		{
+			"SixWaitFree",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+				testTeardown4 := testUse(t, cfg, prefix)
+				testTeardown5 := testUse(t, cfg, prefix)
+
+				var wg sync.WaitGroup
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown6 := testUse(t, cfg, prefix)
+
+					testTeardown6(t)
+				}()
+
+				time.Sleep(time.Second * 2)
+
+				testTeardown5(t)
+				testTeardown4(t)
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				wg.Wait()
+
+				return prefix
+			},
+		},
+		{
+			"SevenWaitFree",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+				testTeardown4 := testUse(t, cfg, prefix)
+				testTeardown5 := testUse(t, cfg, prefix)
+
+				var wg sync.WaitGroup
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown6 := testUse(t, cfg, prefix)
+
+					testTeardown6(t)
+				}()
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown7 := testUse(t, cfg, prefix)
+
+					testTeardown7(t)
+				}()
+
+				time.Sleep(time.Second * 2)
+
+				testTeardown5(t)
+				testTeardown4(t)
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				wg.Wait()
+
+				return prefix
+			},
+		},
+		{
+			"EightWaitFree",
+			func(t *testing.T) string {
+				cfg, prefix := testutil.GetCfg()
+				testTeardown1 := testUse(t, cfg, prefix)
+				testTeardown2 := testUse(t, cfg, prefix)
+				testTeardown3 := testUse(t, cfg, prefix)
+				testTeardown4 := testUse(t, cfg, prefix)
+				testTeardown5 := testUse(t, cfg, prefix)
+
+				var wg sync.WaitGroup
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown6 := testUse(t, cfg, prefix)
+
+					testTeardown6(t)
+				}()
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown7 := testUse(t, cfg, prefix)
+
+					testTeardown7(t)
+				}()
+
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+					testTeardown8 := testUse(t, cfg, prefix)
+
+					testTeardown8(t)
+				}()
+
+				time.Sleep(time.Second * 2)
+
+				testTeardown5(t)
+				testTeardown4(t)
+				testTeardown3(t)
+				testTeardown2(t)
+				testTeardown1(t)
+
+				wg.Wait()
+
+				return prefix
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			prefix := tt.process(t)
+
+			t.Cleanup(func() {
+				if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
+					t.Fatal(err)
+				}
+			})
 		})
-	})
-
-	t.Run("Two", func(t *testing.T) {
-		t.Parallel()
-
-		cfg, prefix := testutil.GetCfg()
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-
-		t.Cleanup(func() {
-			if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
-				t.Fatal(err)
-			}
-		})
-	})
-
-	t.Run("Three", func(t *testing.T) {
-		t.Parallel()
-
-		cfg, prefix := testutil.GetCfg()
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-
-		t.Cleanup(func() {
-			if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
-				t.Fatal(err)
-			}
-		})
-	})
-
-	t.Run("Four", func(t *testing.T) {
-		t.Parallel()
-
-		cfg, prefix := testutil.GetCfg()
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-
-		t.Cleanup(func() {
-			if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
-				t.Fatal(err)
-			}
-		})
-	})
-
-	t.Run("Five", func(t *testing.T) {
-		t.Parallel()
-
-		cfg, prefix := testutil.GetCfg()
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-		testUse(t, cfg, prefix)
-
-		t.Cleanup(func() {
-			if err := testutil.Cleanup(testutil.DB, prefix); err != nil {
-				t.Fatal(err)
-			}
-		})
-	})
+	}
 }
 
 func testUse(t *testing.T, cfg *parabase.Config, prefix string) func(t testing.TB) {
@@ -124,7 +280,8 @@ func testUse(t *testing.T, cfg *parabase.Config, prefix string) func(t testing.T
 	managementDBName := fmt.Sprintf("%s_management", dbName.String[:strings.Index(dbName.String, "_")])
 
 	var contextToken string
-	if err := allocatedDB.QueryRow(fmt.Sprintf("SELECT context_token FROM %s.%s WHERE id = ?", managementDBName, "management"), id).Scan(&contextToken); err != nil {
+
+	if err := testutil.DB.QueryRow(fmt.Sprintf("SELECT context_token FROM %s.%s WHERE id = ?", managementDBName, "management"), id).Scan(&contextToken); err != nil {
 		t.Fatal(err)
 	}
 
@@ -133,5 +290,34 @@ func testUse(t *testing.T, cfg *parabase.Config, prefix string) func(t testing.T
 		return nil
 	}
 
-	return teardown
+	testTeardown := func(t testing.TB) {
+		teardown(t)
+
+		rows, err := testutil.DB.Query(fmt.Sprintf("SELECT 1 FROM %s.%s WHERE context_token = ?", managementDBName, "management"), contextToken)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer rows.Close()
+
+		var unfree bool
+
+		for rows.Next() {
+			unfree = true
+		}
+
+		if err := rows.Close(); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := rows.Err(); err != nil {
+			t.Fatal(err)
+		}
+
+		if unfree {
+			t.Error("management database is not free")
+			return
+		}
+	}
+
+	return testTeardown
 }

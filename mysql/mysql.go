@@ -133,7 +133,7 @@ func (d *ManagementDatabase) Get(db *sql.DB, cfg *parabase.Config) (*sql.DB, fun
 			var id int
 			err = db.QueryRowContext(ctx, d.checkAllocatedTestDB(token)).Scan(&id)
 			if errors.Is(err, sql.ErrNoRows) {
-				time.Sleep(time.Millisecond)
+				time.Sleep(time.Millisecond * 100)
 				continue
 			}
 

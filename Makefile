@@ -9,4 +9,8 @@ cleanup: ## cleanup test db
 
 .PHONY: test
 test: ## go test
-	docker compose run --rm app bash -c "go test ./... -race"
+ifeq ($(IS_DOCKER), true)
+	go test ./... -race -v
+else
+	docker compose run --rm app bash -c "go test ./... -race -v"
+endif
