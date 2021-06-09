@@ -35,6 +35,6 @@ jobs:
         run: go test -race ./...
         env:
           MYSQL_USER: root
-          MYSQL_PASS: password
+          MYSQL_PASSWORD: password
           MYSQL_HOST: localhost
           MYSQL_PORT:  ${{ job.services.mysql.ports[3306] }}
