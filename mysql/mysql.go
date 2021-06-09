@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/nasjp/parabase"
 )
@@ -98,17 +99,34 @@ func (d *ManagementDatabase) Setup(db *sql.DB, cfg *parabase.Config) error {
 	return nil
 }
 
+func tryFreeDB(db *sql.DB, d *ManagementDatabase, id int, cnt int) error {
+	if cnt == 5 {
+		return errors.New("can't exec %s by Deadlock")
+	}
+	if _, err := db.ExecContext(context.Background(), d.freeTestDB(id)); err != nil {
+		sqlErr := &mysql.MySQLError{}
+		if errors.As(err, &sqlErr) {
+			// Error 1213: Deadlock found when trying to get lock; try restarting transaction
+			if sqlErr.Number == 1213 {
+				tryFreeDB(db, d, id, cnt+1)
+			}
+		}
+	}
+
+	if err := db.Close(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (d *ManagementDatabase) Get(db *sql.DB, cfg *parabase.Config) (*sql.DB, func(testing.TB), error) {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
 	defer cancel()
 
 	getTeardownFunc := func(id int, allocatedDB *sql.DB) func(testing.TB) {
 		return func(t testing.TB) {
-			if _, err := db.ExecContext(context.Background(), d.freeTestDB(id)); err != nil {
-				t.Fatal(err)
-			}
-
-			if err := db.Close(); err != nil {
+			if err := tryFreeDB(db, d, id, 1); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -133,7 +151,7 @@ func (d *ManagementDatabase) Get(db *sql.DB, cfg *parabase.Config) (*sql.DB, fun
 			var id int
 			err = db.QueryRowContext(ctx, d.checkAllocatedTestDB(token)).Scan(&id)
 			if errors.Is(err, sql.ErrNoRows) {
-				time.Sleep(time.Millisecond * 100)
+				time.Sleep(1000 * time.Millisecond)
 				continue
 			}
 

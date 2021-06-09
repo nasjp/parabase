@@ -25,7 +25,6 @@ func setupDB() *sql.DB {
 	}
 
 	if err := db.Ping(); err != nil {
-		fmt.Printf("hgoehogehogheohgoe, %s, %s\n", cfg.DriverName, cfg.DataSourceName)
 		log.Fatal(err)
 	}
 

@@ -1,15 +1,6 @@
 #!/bin/sh
 
-set -e
-
-cmd="$@"
-
-echo "Waiting for MySQL"
-until mysql -h mysql -u root --password=password &> /dev/null
+until mysqladmin ping -h mysql -u root --password=password --silent;
 do
-        >&2 echo -n "."
-        sleep 1
+  sleep 1
 done
-
->&2 echo "MySQL is Up - executing command"
-exec $cmd

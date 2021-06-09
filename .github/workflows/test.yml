@@ -32,9 +32,10 @@ jobs:
         run: go mod download
 
       - name: Run
-        run: go test -race ./...
+        run: make ci
         env:
           MYSQL_USER: root
           MYSQL_PASSWORD: password
           MYSQL_HOST: localhost
           MYSQL_PORT:  ${{ job.services.mysql.ports[3306] }}
+          IS_DOCKER: true
