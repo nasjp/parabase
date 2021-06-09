@@ -9,7 +9,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: password
         ports:
-          - 3306
+          - 3306:3306
         options: --health-cmd "mysqladmin ping" --health-interval 20s --health-timeout 10s --health-retries 10
 
     steps:
@@ -40,5 +40,5 @@ jobs:
           MYSQL_USER: root
           MYSQL_PASSWORD: password
           MYSQL_HOST: localhost
-          MYSQL_PORT:  ${{ job.services.mysql.ports[3306] }}
+          MYSQL_PORT:  3306
           IS_DOCKER: true
