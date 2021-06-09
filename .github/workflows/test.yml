@@ -3,14 +3,33 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7.25
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306
+        options: --health-cmd "mysqladmin ping" --health-interval 20s --health-timeout 10s --health-retries 10
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - run: docker-compose pull
+      - name: Setup Go
+        uses: actions/setup-go@v2
 
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
+      - name: Use cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
-      - run: docker-compose build
+      - name: Download modules
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: go mod download
 
-      - run: docker-compose run --rm app bash -c "sh wait.sh go test ./... -race"
+      - name: Run
+        run: go test -race ./...
