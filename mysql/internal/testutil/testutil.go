@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/nasjp/parabase"
@@ -55,9 +56,15 @@ func GetCfg() (*parabase.Config, string) {
 	return &parabase.Config{
 		DegreeOfParallelism: 5,
 		DriverName:          "mysql",
-		DataSourceName:      "root:password@tcp(mysql:3306)/",
-		Timeout:             time.Second * 10,
-		ManagementDatabase:  managementDatabase,
+		DataSourceName: fmt.Sprintf(
+			"%s:%s@tcp(%s:%s)/",
+			os.Getenv("MYSQL_USER"),
+			os.Getenv("MYSQL_PASSWORD"),
+			os.Getenv("MYSQL_HOST"),
+			os.Getenv("MYSQL_PORT"),
+		),
+		Timeout:            time.Second * 10,
+		ManagementDatabase: managementDatabase,
 	}, prefix
 }
 

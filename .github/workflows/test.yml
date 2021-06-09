@@ -33,3 +33,9 @@ jobs:
 
       - name: Run
         run: go test -race ./...
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306

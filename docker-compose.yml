@@ -10,6 +10,11 @@ services:
     working_dir: /app
     depends_on:
       - mysql
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
 
   mysql:
     image: mysql:5.7.34
