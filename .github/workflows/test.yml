@@ -31,20 +31,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: go mod download
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      - name: Run
+        run: go test ./... -race -cover
         env:
           MYSQL_USER: root
           MYSQL_PASSWORD: password
           MYSQL_HOST: localhost
           MYSQL_PORT:  3306
           IS_DOCKER: true
-
-      # - name: Run
-      #   run: go test ./... -race -cover
-      #   env:
-      #     MYSQL_USER: root
-      #     MYSQL_PASSWORD: password
-      #     MYSQL_HOST: localhost
-      #     MYSQL_PORT:  3306
-      #     IS_DOCKER: true

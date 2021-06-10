@@ -13,16 +13,24 @@ endif
 
 .PHONY: wait-db
 wait-db: ## wait for the database to wake up
+ifeq ($(CI), true)
+	@:
+else
 	@echo '<wait-db>'
 ifeq ($(IS_DOCKER), true)
 	@sh wait.sh
 else
 	@docker compose run --rm app sh -c "sh wait.sh"
 endif
+endif
+
 
 
 .PHONY: cleanup-test-db
 cleanup-test-db: wait-db ## cleanup test db
+ifeq ($(CI), true)
+	@:
+else
 	@echo '<cleanup-test-db>'
 ifeq ($(IS_DOCKER), true)
 	@mysql -u root --password=password -e 'show databases' | grep _test | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'
@@ -30,6 +38,7 @@ ifeq ($(IS_DOCKER), true)
 else
 	@docker compose exec mysql bash -c "mysql -u root --password=password -e 'show databases' | grep _test | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
 	@docker compose exec mysql bash -c "mysql -u root --password=password -e 'show databases' | grep _management | xargs -I DB mysql --password=password -e 'DROP DATABASE IF EXISTS DB'"
+endif
 endif
 
 .PHONY: test
