@@ -32,7 +32,7 @@ jobs:
         run: go mod download
 
       - name: Run
-        run: go test ./... -race -cover
+        run: make ci
         env:
           MYSQL_USER: root
           MYSQL_PASSWORD: password
