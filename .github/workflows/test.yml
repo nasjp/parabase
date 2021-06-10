@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7.25
+        image: mysql:5.7.34
         env:
           MYSQL_ROOT_PASSWORD: password
         ports:
@@ -33,6 +33,12 @@ jobs:
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
+        env:
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password
+          MYSQL_HOST: localhost
+          MYSQL_PORT:  3306
+          IS_DOCKER: true
 
       - name: Run
         run: make ci
