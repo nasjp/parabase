@@ -40,11 +40,11 @@ jobs:
           MYSQL_PORT:  3306
           IS_DOCKER: true
 
-      - name: Run
-        run: make ci
-        env:
-          MYSQL_USER: root
-          MYSQL_PASSWORD: password
-          MYSQL_HOST: localhost
-          MYSQL_PORT:  3306
-          IS_DOCKER: true
+      # - name: Run
+      #   run: go test ./... -race -cover
+      #   env:
+      #     MYSQL_USER: root
+      #     MYSQL_PASSWORD: password
+      #     MYSQL_HOST: localhost
+      #     MYSQL_PORT:  3306
+      #     IS_DOCKER: true
