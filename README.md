@@ -1,3 +1,5 @@
+[![ci](https://github.com/nasjp/parabase/actions/workflows/ci.yml/badge.svg)](https://github.com/nasjp/parabase/actions/workflows/ci.yml)
+
 # parabase
 
 ```go
